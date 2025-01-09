@@ -46,11 +46,11 @@ st.header("Avaliação")
 avaliacao_objetivos = st.text_area("O que pode ser feito para observar se os objetivos da aula foram cumpridos?")
 avaliacao_feedback = st.text_area("Como foi sua avaliação da aula? (Aspectos positivos e negativos)")
 
-# Objetivo Específico para o Método Hipotético-Dedutivo
+# **Objetivo Específico para o Método Hipotético-Dedutivo**
 st.header("Objetivo Específico para o Método Hipotético-Dedutivo")
 objetivo_mhd = st.text_area("Defina o objetivo específico para a utilização do MHD na aula")
 
-# Etapas do Método Hipotético-Dedutivo
+# **Etapas do Método Hipotético-Dedutivo**
 st.header("Etapas do Método Hipotético-Dedutivo")
 observacao = st.text_area("Observação")
 hipotese = st.text_area("Hipótese")
@@ -90,4 +90,3 @@ if st.button("Gerar Plano de Aula"):
     st.write("- **Teste Experimental:**", teste_experimental)
     st.write("- **Análise e Consolidação:**", analise_consolidacao)
     st.write("**Reflexão Final:**", reflexao_final)
-
