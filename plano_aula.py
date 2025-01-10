@@ -92,10 +92,49 @@ def planejamento_aula_function():
                     canvas.setFont("Helvetica", 12)
             return y
 
-        # Adicionar conteúdo ao PDF
-        c.setFont("Helvetica", 12)
-        y -= 20
-        c.drawString(margin_x, y, "Exemplo de conteúdo gerado no PDF.")
+        # Função auxiliar para adicionar títulos
+        def add_title(canvas, text, x, y):
+            canvas.setFont("Helvetica-Bold", 14)  # Fonte maior e em negrito
+            canvas.drawString(x, y, text)  # Adicionar título
+            return y - 30  # Ajustar espaçamento após o título
+
+        # Adicionar conteúdo ao PDF por seção
+        # Parte 1 - Informações Gerais
+        y = add_title(c, "Informações Gerais", margin_x, y)
+        sections = [
+            ("Nome do Professor", professor),
+            ("Disciplina", disciplina),
+            ("Duração da Aula", duracao),
+            ("Número de Alunos", numero_alunos),
+            ("Tema", tema),
+        ]
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y
+                c.setFont("Helvetica", 12)
+
+        # Parte 2 - Competências, Conteúdo e Recursos
+        y = add_title(c, "Competências, Conteúdo e Recursos", margin_x, y)
+        sections = [
+            ("Competência de Área", competencia),
+            ("Habilidades", habilidades),
+            ("Conteúdo", conteudo),
+            ("Recursos", recursos),
+        ]
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y
+                c.setFont("Helvetica", 12)
 
         # Finalizar PDF
         c.save()
