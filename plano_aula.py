@@ -56,11 +56,11 @@ def planejamento_aula_function():
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
         margin_x = 50
-        margin_y = 70
-        y = height - margin_y - 30
+        margin_y = 70  # Ajuste para margens superiores e inferiores
+        y = height - margin_y  # Início do conteúdo no topo
 
+        # Função auxiliar para desenhar texto justificado e verificar quebra de página
         def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
-            """Desenha texto justificado com verificação de quebra de página."""
             words = text.split()
             line = ""
             for word in words:
@@ -70,25 +70,29 @@ def planejamento_aula_function():
                 else:
                     canvas.drawString(x, y, line)
                     y -= line_height
-                    if y < margin_y:
+                    if y < margin_y:  # Quebra de página
                         canvas.showPage()
-                        y = height - margin_y - 30
+                        y = height - margin_y
                         canvas.setFont("Helvetica", 12)
                     line = word
             if line:
                 canvas.drawString(x, y, line)
                 y -= line_height
-                if y < margin_y:
+                if y < margin_y:  # Verificar margem inferior
                     canvas.showPage()
-                    y = height - margin_y - 30
+                    y = height - margin_y
                     canvas.setFont("Helvetica", 12)
             return y
 
-        def add_section(canvas, title, fields, y):
-            """Adiciona seções com verificação de espaço e títulos."""
+        # Função auxiliar para adicionar títulos
+        def add_title(canvas, text, x, y):
             canvas.setFont("Helvetica-Bold", 14)
-            canvas.drawString(margin_x, y, title)
-            y -= 30
+            canvas.drawString(x, y, text)
+            return y - 30
+
+        # Adicionar seções ao PDF
+        def add_section(canvas, title, fields, y):
+            y = add_title(canvas, title, margin_x, y)
             for label, value in fields:
                 canvas.setFont("Helvetica", 12)
                 canvas.drawString(margin_x, y, f"{label}:")
@@ -97,7 +101,7 @@ def planejamento_aula_function():
                 y -= 20
                 if y < margin_y:
                     canvas.showPage()
-                    y = height - margin_y - 30
+                    y = height - margin_y
             return y
 
         # Adicionar todas as seções
@@ -116,12 +120,14 @@ def planejamento_aula_function():
             ("Recursos", recursos),
         ], y)
 
-        y = add_section(c, "Organização dos Espaços", [
-            (f"Espaço {i+1} - Atividade", esp[0]),
-            (f"Espaço {i+1} - Duração", esp[1]),
-            (f"Espaço {i+1} - Papel do Aluno", esp[2]),
-            (f"Espaço {i+1} - Papel do Professor", esp[3])
-        ] for i, esp in enumerate(espacos), y)
+        y = add_title(c, "Organização dos Espaços", margin_x, y)
+        for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
+            y = add_section(c, f"Espaço {i}", [
+                ("Atividade", atividade),
+                ("Duração", duracao_espaco),
+                ("Papel do Aluno", papel_aluno),
+                ("Papel do Professor", papel_professor),
+            ], y)
 
         y = add_section(c, "Avaliação", [
             ("Avaliação dos Objetivos", avaliacao_objetivos),
