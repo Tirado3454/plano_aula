@@ -57,9 +57,8 @@ def planejamento_aula_function():
         # Botão de envio
         submitted = st.form_submit_button("Gerar PDF")
 
-        # Verificação do botão de envio DENTRO do contexto do formulário
-        
-   if submitted:
+    # Verificação se o botão foi clicado
+    if submitted:
         # Geração do PDF
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
@@ -68,109 +67,53 @@ def planejamento_aula_function():
         margin_y = 50
         y = height - margin_y
 
-    # Função auxiliar para justificar texto e verificar quebra de página
-    def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
-        words = text.split()
-        line = ""
-        for word in words:
-            test_line = " ".join([line, word]).strip()
-            if canvas.stringWidth(test_line, "Helvetica", 12) < max_width:
-                line = test_line
-            else:
+        # Função auxiliar para justificar texto e verificar quebra de página
+        def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
+            words = text.split()
+            line = ""
+            for word in words:
+                test_line = " ".join([line, word]).strip()
+                if canvas.stringWidth(test_line, "Helvetica", 12) < max_width:
+                    line = test_line
+                else:
+                    canvas.drawString(x, y, line)
+                    y -= line_height
+                    if y < margin_y:  # Verificar margem inferior
+                        canvas.showPage()
+                        y = height - margin_y
+                        canvas.setFont("Helvetica", 12)
+                    line = word
+            if line:
                 canvas.drawString(x, y, line)
                 y -= line_height
-                if y < margin_y:  # Verificar margem inferior
+                if y < margin_y:  # Verificar margem inferior novamente
                     canvas.showPage()
                     y = height - margin_y
                     canvas.setFont("Helvetica", 12)
-                line = word
-        if line:
-            canvas.drawString(x, y, line)
-            y -= line_height
-            if y < margin_y:  # Verificar margem inferior novamente
-                canvas.showPage()
-                y = height - margin_y
-                canvas.setFont("Helvetica", 12)
-        return y
+            return y
 
-    # Função auxiliar para adicionar títulos
-    def add_title(canvas, text, x, y):
-        canvas.setFont("Helvetica-Bold", 14)  # Fonte maior e em negrito
-        canvas.drawString(x, y, text)  # Adicionar título
-        return y - 30  # Ajustar espaçamento após o título
-
-    # Adicionar conteúdo ao PDF por seção
-    # Parte 1 - Informações Gerais
-    y = add_title(c, "Informações Gerais", margin_x, y)
-    sections = [
-        ("Nome do Professor", professor),
-        ("Disciplina", disciplina),
-        ("Duração da Aula", duracao),
-        ("Número de Alunos", numero_alunos),
-        ("Tema", tema),
-    ]
-    for label, value in sections:
-        c.drawString(margin_x, y, f"{label}:")
+        # Adicionar conteúdo ao PDF
+        c.setFont("Helvetica", 12)
         y -= 20
-        y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-        y -= 20
-        if y < margin_y:
-            c.showPage()
-            y = height - margin_y
-            c.setFont("Helvetica", 12)
+        c.drawString(margin_x, y, "Exemplo de conteúdo gerado no PDF.")
 
-    # Parte 2 - Competências, Conteúdo e Recursos
-    y = add_title(c, "Competências, Conteúdo e Recursos", margin_x, y)
-    sections = [
-        ("Competência de Área", competencia),
-        ("Habilidades", habilidades),
-        ("Conteúdo", conteudo),
-        ("Recursos", recursos),
-    ]
-    for label, value in sections:
-        c.drawString(margin_x, y, f"{label}:")
-        y -= 20
-        y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-        y -= 20
-        if y < margin_y:
-            c.showPage()
-            y = height - margin_y
-            c.setFont("Helvetica", 12)
+        # Finalizar PDF
+        c.save()
+        buffer.seek(0)
 
-    # Parte 3 - Organização dos Espaços
-    y = add_title(c, "Organização dos Espaços", margin_x, y)
-    for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
-        sections = [
-            (f"Espaço {i} - Atividade", atividade),
-            (f"Espaço {i} - Duração", duracao_espaco),
-            (f"Espaço {i} - Papel do Aluno", papel_aluno),
-            (f"Espaço {i} - Papel do Professor", papel_professor),
-        ]
-        for label, value in sections:
-            c.drawString(margin_x, y, f"{label}:")
-            y -= 20
-            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-            y -= 20
-            if y < margin_y:
-                c.showPage()
-                y = height - margin_y
-                c.setFont("Helvetica", 12)
+        # Exibir e baixar PDF
+        pdf_data = buffer.getvalue()
+        st.markdown("### Visualização do PDF")
+        st.markdown(
+            f'<iframe src="data:application/pdf;base64,{base64.b64encode(pdf_data).decode()}" width="700" height="500"></iframe>',
+            unsafe_allow_html=True,
+        )
+        st.download_button(
+            label="Baixar PDF",
+            data=pdf_data,
+            file_name="planejamento_aula.pdf",
+            mime="application/pdf",
+        )
 
-    # Finalizar PDF
-    c.save()
-    buffer.seek(0)
-
-    # Exibir e baixar PDF
-    pdf_data = buffer.getvalue()
-    st.markdown("### Visualização do PDF")
-    st.markdown(
-        f'<iframe src="data:application/pdf;base64,{base64.b64encode(pdf_data).decode()}" width="700" height="500"></iframe>',
-        unsafe_allow_html=True,
-    )
-    st.download_button(
-        label="Baixar PDF",
-        data=pdf_data,
-        file_name="planejamento_aula.pdf",
-        mime="application/pdf",
-    )
-
+if __name__ == "__main__":
+    planejamento_aula_function()
