@@ -57,15 +57,16 @@ def planejamento_aula_function():
         # Botão de envio
         submitted = st.form_submit_button("Gerar PDF")
 
-       # Verificação se o botão foi clicado
-if submitted:
-    # Geração do PDF
-    buffer = BytesIO()
-    c = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
-    margin_x = 50
-    margin_y = 50
-    y = height - margin_y
+        # Verificação do botão de envio DENTRO do contexto do formulário
+        
+   if submitted:
+        # Geração do PDF
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        margin_x = 50
+        margin_y = 50
+        y = height - margin_y
 
     # Função auxiliar para justificar texto e verificar quebra de página
     def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
