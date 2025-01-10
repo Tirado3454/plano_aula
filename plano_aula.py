@@ -54,128 +54,133 @@ def planejamento_aula_function():
         questionamentos = st.text_area("Questionamentos Norteadores:", help="Liste perguntas que guiarão a aula e a discussão.")
         reflexao = st.text_area("Reflexão Final:", help="Escreva a reflexão final sobre a aula, considerando os aprendizados e desafios.")
 
+        # Botão de envio
         submitted = st.form_submit_button("Gerar PDF")
 
-if submitted:
-    # Geração do PDF
-    buffer = BytesIO()
-    c = canvas.Canvas(buffer, pagesize=letter)
-    width, height = letter
-    margin_x = 50
-    margin_y = 50
-    y = height - margin_y
+    # Verificação se o botão foi clicado
+    if submitted:
+        # Geração do PDF
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        margin_x = 50
+        margin_y = 50
+        y = height - margin_y
 
-    # Função auxiliar para justificar texto e verificar quebra de página
-    def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
-        words = text.split()
-        line = ""
-        for word in words:
-            test_line = " ".join([line, word]).strip()
-            if canvas.stringWidth(test_line, "Helvetica", 12) < max_width:
-                line = test_line
-            else:
+        # Função auxiliar para justificar texto e verificar quebra de página
+        def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
+            words = text.split()
+            line = ""
+            for word in words:
+                test_line = " ".join([line, word]).strip()
+                if canvas.stringWidth(test_line, "Helvetica", 12) < max_width:
+                    line = test_line
+                else:
+                    canvas.drawString(x, y, line)
+                    y -= line_height
+                    if y < margin_y:  # Verificar margem inferior
+                        canvas.showPage()
+                        y = height - margin_y
+                        canvas.setFont("Helvetica", 12)
+                    line = word
+            if line:
                 canvas.drawString(x, y, line)
                 y -= line_height
-                if y < margin_y:  # Verificar margem inferior
+                if y < margin_y:  # Verificar margem inferior novamente
                     canvas.showPage()
                     y = height - margin_y
                     canvas.setFont("Helvetica", 12)
-                line = word
-        if line:
-            canvas.drawString(x, y, line)
-            y -= line_height
-            if y < margin_y:  # Verificar margem inferior novamente
-                canvas.showPage()
+            return y
+
+        # Função auxiliar para adicionar títulos
+        def add_title(canvas, text, x, y):
+            canvas.setFont("Helvetica-Bold", 14)  # Fonte maior e em negrito
+            canvas.drawString(x, y, text)  # Adicionar título
+            return y - 30  # Ajustar espaçamento após o título
+
+        # Organização dos campos no PDF com títulos
+        c.setFont("Helvetica", 12)
+        
+        # Parte 1 - Informações Gerais
+        y = add_title(c, "Informações Gerais", margin_x, y)
+        sections = [
+            ("Nome do Professor", professor),
+            ("Disciplina", disciplina),
+            ("Duração da Aula", duracao),
+            ("Número de Alunos", numero_alunos),
+            ("Tema", tema),
+        ]
+
+        # Parte 2 - Competências, Conteúdo e Recursos
+        y = add_title(c, "Competências, Conteúdo e Recursos", margin_x, y)
+        sections += [
+            ("Competência de Área", competencia),
+            ("Habilidades", habilidades),
+            ("Conteúdo", conteudo),
+            ("Recursos", recursos),
+        ]
+
+        # Parte 3 - Organização dos Espaços
+        y = add_title(c, "Organização dos Espaços", margin_x, y)
+        for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
+            sections.append((f"Espaço {i} - Atividade", atividade))
+            sections.append((f"Espaço {i} - Duração", duracao_espaco))
+            sections.append((f"Espaço {i} - Papel do Aluno", papel_aluno))
+            sections.append((f"Espaço {i} - Papel do Professor", papel_professor))
+
+        # Parte 4 - Avaliação
+        y = add_title(c, "Avaliação", margin_x, y)
+        sections += [
+            ("Avaliação dos Objetivos", avaliacao_objetivos),
+            ("Avaliação da Aula", avaliacao_aula),
+        ]
+
+        # Parte 5 - Etapas do Método Hipotético-Dedutivo
+        y = add_title(c, "Etapas do Método Hipotético-Dedutivo", margin_x, y)
+        sections += [
+            ("Observação", observacao),
+            ("Hipótese", hipotese),
+            ("Dedução", deducao),
+            ("Teste Experimental", teste),
+            ("Análise e Consolidação", analise),
+        ]
+
+        # Parte 6 - Reflexão e Registros
+        y = add_title(c, "Reflexão e Registros", margin_x, y)
+        sections += [
+            ("Registro dos Alunos", registro),
+            ("Questionamentos Norteadores", questionamentos),
+            ("Reflexão Final", reflexao),
+        ]
+
+        # Escrever seções no PDF
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
                 y = height - margin_y
-                canvas.setFont("Helvetica", 12)
-        return y
+                c.setFont("Helvetica", 12)
 
-    # Função auxiliar para adicionar títulos
-    def add_title(canvas, text, x, y):
-        canvas.setFont("Helvetica-Bold", 14)  # Fonte maior e em negrito
-        canvas.drawString(x, y, text)  # Adicionar título
-        return y - 30  # Ajustar espaçamento após o título
+        # Finalizar PDF
+        c.save()
+        buffer.seek(0)
 
-    # Organização dos campos no PDF com títulos
-    c.setFont("Helvetica", 12)
-    
-    # Parte 1 - Informações Gerais
-    y = add_title(c, "Informações Gerais", margin_x, y)
-    sections = [
-        ("Nome do Professor", professor),
-        ("Disciplina", disciplina),
-        ("Duração da Aula", duracao),
-        ("Número de Alunos", numero_alunos),
-        ("Tema", tema),
-    ]
+        # Exibir e baixar PDF
+        pdf_data = buffer.getvalue()
+        st.markdown("### Visualização do PDF")
+        st.markdown(
+            f'<iframe src="data:application/pdf;base64,{base64.b64encode(pdf_data).decode()}" width="700" height="500"></iframe>',
+            unsafe_allow_html=True,
+        )
+        st.download_button(
+            label="Baixar PDF",
+            data=pdf_data,
+            file_name="planejamento_aula.pdf",
+            mime="application/pdf",
+        )
 
-    # Parte 2 - Competências, Conteúdo e Recursos
-    y = add_title(c, "Competências, Conteúdo e Recursos", margin_x, y)
-    sections += [
-        ("Competência de Área", competencia),
-        ("Habilidades", habilidades),
-        ("Conteúdo", conteudo),
-        ("Recursos", recursos),
-    ]
-
-    # Parte 3 - Organização dos Espaços
-    y = add_title(c, "Organização dos Espaços", margin_x, y)
-    for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
-        sections.append((f"Espaço {i} - Atividade", atividade))
-        sections.append((f"Espaço {i} - Duração", duracao_espaco))
-        sections.append((f"Espaço {i} - Papel do Aluno", papel_aluno))
-        sections.append((f"Espaço {i} - Papel do Professor", papel_professor))
-
-    # Parte 4 - Avaliação
-    y = add_title(c, "Avaliação", margin_x, y)
-    sections += [
-        ("Avaliação dos Objetivos", avaliacao_objetivos),
-        ("Avaliação da Aula", avaliacao_aula),
-    ]
-
-    # Parte 5 - Etapas do Método Hipotético-Dedutivo
-    y = add_title(c, "Etapas do Método Hipotético-Dedutivo", margin_x, y)
-    sections += [
-        ("Observação", observacao),
-        ("Hipótese", hipotese),
-        ("Dedução", deducao),
-        ("Teste Experimental", teste),
-        ("Análise e Consolidação", analise),
-    ]
-
-    # Parte 6 - Reflexão e Registros
-    y = add_title(c, "Reflexão e Registros", margin_x, y)
-    sections += [
-        ("Registro dos Alunos", registro),
-        ("Questionamentos Norteadores", questionamentos),
-        ("Reflexão Final", reflexao),
-    ]
-
-    # Escrever seções no PDF
-    for label, value in sections:
-        c.drawString(margin_x, y, f"{label}:")
-        y -= 20
-        y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-        y -= 20
-        if y < margin_y:
-            c.showPage()
-            y = height - margin_y
-            c.setFont("Helvetica", 12)
-
-    # Finalizar PDF
-    c.save()
-    buffer.seek(0)
-
-    # Exibir e baixar PDF
-    pdf_data = buffer.getvalue()
-    st.markdown("### Visualização do PDF")
-    st.markdown(
-        f'<iframe src="data:application/pdf;base64,{base64.b64encode(pdf_data).decode()}" width="700" height="500"></iframe>',
-        unsafe_allow_html=True,
-    )
-    st.download_button(
-        label="Baixar PDF",
-        data=pdf_data,
-        file_name="planejamento_aula.pdf",
-        mime="application/pdf",
-    )
+if __name__ == "__main__":
+    planejamento_aula_function()
