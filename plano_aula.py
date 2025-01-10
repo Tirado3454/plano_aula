@@ -99,7 +99,6 @@ def planejamento_aula_function():
             return y - 30  # Ajustar espaçamento após o título
 
         # Adicionar conteúdo ao PDF por seção
-        # Parte 1 - Informações Gerais
         y = add_title(c, "Informações Gerais", margin_x, y)
         sections = [
             ("Nome do Professor", professor),
@@ -107,6 +106,10 @@ def planejamento_aula_function():
             ("Duração da Aula", duracao),
             ("Número de Alunos", numero_alunos),
             ("Tema", tema),
+            ("Competência de Área", competencia),
+            ("Habilidades", habilidades),
+            ("Conteúdo", conteudo),
+            ("Recursos", recursos),
         ]
         for label, value in sections:
             c.drawString(margin_x, y, f"{label}:")
@@ -118,13 +121,38 @@ def planejamento_aula_function():
                 y = height - margin_y
                 c.setFont("Helvetica", 12)
 
-        # Parte 2 - Competências, Conteúdo e Recursos
-        y = add_title(c, "Competências, Conteúdo e Recursos", margin_x, y)
+        # Adicionar organização dos espaços
+        y = add_title(c, "Organização dos Espaços", margin_x, y)
+        for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
+            sections = [
+                (f"Espaço {i} - Atividade", atividade),
+                (f"Espaço {i} - Duração", duracao_espaco),
+                (f"Espaço {i} - Papel do Aluno", papel_aluno),
+                (f"Espaço {i} - Papel do Professor", papel_professor),
+            ]
+            for label, value in sections:
+                c.drawString(margin_x, y, f"{label}:")
+                y -= 20
+                y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+                y -= 20
+                if y < margin_y:
+                    c.showPage()
+                    y = height - margin_y
+                    c.setFont("Helvetica", 12)
+
+        # Adicionar restante das partes
+        y = add_title(c, "Avaliação", margin_x, y)
         sections = [
-            ("Competência de Área", competencia),
-            ("Habilidades", habilidades),
-            ("Conteúdo", conteudo),
-            ("Recursos", recursos),
+            ("Avaliação dos Objetivos", avaliacao_objetivos),
+            ("Avaliação da Aula", avaliacao_aula),
+            ("Observação", observacao),
+            ("Hipótese", hipotese),
+            ("Dedução", deducao),
+            ("Teste Experimental", teste),
+            ("Análise e Consolidação", analise),
+            ("Registro dos Alunos", registro),
+            ("Questionamentos Norteadores", questionamentos),
+            ("Reflexão Final", reflexao),
         ]
         for label, value in sections:
             c.drawString(margin_x, y, f"{label}:")
@@ -156,3 +184,4 @@ def planejamento_aula_function():
 
 if __name__ == "__main__":
     planejamento_aula_function()
+
