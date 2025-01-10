@@ -58,7 +58,7 @@ def planejamento_aula_function():
         submitted = st.form_submit_button("Gerar PDF")
 
     # Verificação se o botão foi clicado
-   if submitted:
+if submitted:
     # Geração do PDF
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
@@ -172,3 +172,4 @@ def planejamento_aula_function():
         file_name="planejamento_aula.pdf",
         mime="application/pdf",
     )
+
