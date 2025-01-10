@@ -58,6 +58,12 @@ def planejamento_aula_function():
         submitted = st.form_submit_button("Gerar PDF")
 
     # Verificação se o botão foi clicado
+    if submitted:
+        # Adicionar aqui a lógica de geração do PDF
+        st.write("Geração do PDF em progresso...")
+
+
+    # Verificação se o botão foi clicado
 if submitted:
     # Geração do PDF
     buffer = BytesIO()
