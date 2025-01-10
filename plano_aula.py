@@ -56,8 +56,8 @@ def planejamento_aula_function():
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
         margin_x = 50
-        margin_y = 70  # Ajuste da margem inferior
-        y = height - margin_y - 20  # Ajuste inicial para começar mais abaixo
+        margin_y = 70
+        y = height - margin_y - 20
 
         def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
             words = text.split()
@@ -69,15 +69,15 @@ def planejamento_aula_function():
                 else:
                     canvas.drawString(x, y, line)
                     y -= line_height
-                    if y < margin_y:  # Verificar margem inferior
+                    if y < margin_y:
                         canvas.showPage()
-                        y = height - margin_y - 20  # Novo início na nova página
+                        y = height - margin_y - 20
                         canvas.setFont("Helvetica", 12)
                     line = word
             if line:
                 canvas.drawString(x, y, line)
                 y -= line_height
-                if y < margin_y:  # Verificar margem inferior novamente
+                if y < margin_y:
                     canvas.showPage()
                     y = height - margin_y - 20
                     canvas.setFont("Helvetica", 12)
@@ -88,7 +88,7 @@ def planejamento_aula_function():
             canvas.drawString(x, y, text)
             return y - 30
 
-        # Adicionar conteúdo ao PDF
+        # Adicionar cada seção com títulos e conteúdos
         y = add_title(c, "Informações Gerais", margin_x, y)
         sections = [
             ("Nome do Professor", professor),
@@ -96,6 +96,90 @@ def planejamento_aula_function():
             ("Duração da Aula", duracao),
             ("Número de Alunos", numero_alunos),
             ("Tema", tema),
+        ]
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y - 20
+                c.setFont("Helvetica", 12)
+
+        y = add_title(c, "Competências, Conteúdo e Recursos", margin_x, y)
+        sections = [
+            ("Competência de Área", competencia),
+            ("Habilidades", habilidades),
+            ("Conteúdo", conteudo),
+            ("Recursos", recursos),
+        ]
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y - 20
+                c.setFont("Helvetica", 12)
+
+        y = add_title(c, "Organização dos Espaços", margin_x, y)
+        for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
+            sections = [
+                (f"Espaço {i} - Atividade", atividade),
+                (f"Espaço {i} - Duração", duracao_espaco),
+                (f"Espaço {i} - Papel do Aluno", papel_aluno),
+                (f"Espaço {i} - Papel do Professor", papel_professor),
+            ]
+            for label, value in sections:
+                c.drawString(margin_x, y, f"{label}:")
+                y -= 20
+                y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+                y -= 20
+                if y < margin_y:
+                    c.showPage()
+                    y = height - margin_y - 20
+                    c.setFont("Helvetica", 12)
+
+        y = add_title(c, "Avaliação", margin_x, y)
+        sections = [
+            ("Avaliação dos Objetivos", avaliacao_objetivos),
+            ("Avaliação da Aula", avaliacao_aula),
+        ]
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y - 20
+                c.setFont("Helvetica", 12)
+
+        y = add_title(c, "Etapas do Método Hipotético-Dedutivo", margin_x, y)
+        sections = [
+            ("Observação", observacao),
+            ("Hipótese", hipotese),
+            ("Dedução", deducao),
+            ("Teste Experimental", teste),
+            ("Análise e Consolidação", analise),
+        ]
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y - 20
+                c.setFont("Helvetica", 12)
+
+        y = add_title(c, "Reflexão e Registros", margin_x, y)
+        sections = [
+            ("Registro dos Alunos", registro),
+            ("Questionamentos Norteadores", questionamentos),
+            ("Reflexão Final", reflexao),
         ]
         for label, value in sections:
             c.drawString(margin_x, y, f"{label}:")
