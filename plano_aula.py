@@ -58,7 +58,7 @@ def planejamento_aula_function():
         submitted = st.form_submit_button("Gerar PDF")
 
     # Verificação se o botão foi clicado
-    if submitted:
+   if submitted:
     # Geração do PDF
     buffer = BytesIO()
     c = canvas.Canvas(buffer, pagesize=letter)
@@ -99,7 +99,6 @@ def planejamento_aula_function():
         return y - 30  # Ajustar espaçamento após o título
 
     # Adicionar conteúdo ao PDF por seção
-
     # Parte 1 - Informações Gerais
     y = add_title(c, "Informações Gerais", margin_x, y)
     sections = [
@@ -155,58 +154,6 @@ def planejamento_aula_function():
                 c.showPage()
                 y = height - margin_y
                 c.setFont("Helvetica", 12)
-
-    # Parte 4 - Avaliação
-    y = add_title(c, "Avaliação", margin_x, y)
-    sections = [
-        ("Avaliação dos Objetivos", avaliacao_objetivos),
-        ("Avaliação da Aula", avaliacao_aula),
-    ]
-    for label, value in sections:
-        c.drawString(margin_x, y, f"{label}:")
-        y -= 20
-        y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-        y -= 20
-        if y < margin_y:
-            c.showPage()
-            y = height - margin_y
-            c.setFont("Helvetica", 12)
-
-    # Parte 5 - Etapas do Método Hipotético-Dedutivo
-    y = add_title(c, "Etapas do Método Hipotético-Dedutivo", margin_x, y)
-    sections = [
-        ("Observação", observacao),
-        ("Hipótese", hipotese),
-        ("Dedução", deducao),
-        ("Teste Experimental", teste),
-        ("Análise e Consolidação", analise),
-    ]
-    for label, value in sections:
-        c.drawString(margin_x, y, f"{label}:")
-        y -= 20
-        y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-        y -= 20
-        if y < margin_y:
-            c.showPage()
-            y = height - margin_y
-            c.setFont("Helvetica", 12)
-
-    # Parte 6 - Reflexão e Registros
-    y = add_title(c, "Reflexão e Registros", margin_x, y)
-    sections = [
-        ("Registro dos Alunos", registro),
-        ("Questionamentos Norteadores", questionamentos),
-        ("Reflexão Final", reflexao),
-    ]
-    for label, value in sections:
-        c.drawString(margin_x, y, f"{label}:")
-        y -= 20
-        y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
-        y -= 20
-        if y < margin_y:
-            c.showPage()
-            y = height - margin_y
-            c.setFont("Helvetica", 12)
 
     # Finalizar PDF
     c.save()
