@@ -1,69 +1,154 @@
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+import base64
 import streamlit as st
 
-# Título da página
-st.title("Plano de Aula Interativo - Xadrez e Método Hipotético-Dedutivo")
+def planejamento_aula_function():
+    st.title("Planejamento de Aula - Método Hipotético-Dedutivo")
 
-# Informações básicas
-st.header("Informações Básicas")
-professor = st.text_input("Nome do Professor")
-disciplina = st.text_input("Disciplina")
-duracao = st.text_input("Duração da Aula")
-numero_alunos = st.number_input("Número de Alunos", min_value=1, step=1)
-tema = st.text_input("Tema", help="Descreva o tema central da aula, como 'Estratégias de Xadrez' ou 'Método Hipotético-Dedutivo no Xadrez'.")
+    # Formulário para os campos do planejamento
+    with st.form("planejamento_form"):
+        # Parte 1 - Informações Gerais
+        st.subheader("Informações Gerais")
+        professor = st.text_input("Nome do Professor:", help="Digite o nome completo do professor responsável pela aula.")
+        disciplina = st.text_input("Disciplina:", help="Informe a disciplina a qual o plano de aula está relacionado.")
+        duracao = st.text_input("Duração da Aula:", help="Informe o tempo total planejado para a aula.")
+        numero_alunos = st.text_input("Número de Alunos:", help="Especifique o número estimado de alunos para esta aula.")
+        tema = st.text_input("Tema:", help="Defina o tema principal que será abordado na aula.")
 
-# Competências e Habilidades
-st.header("Competências e Habilidades")
-competencias = st.text_area("Competências de Área", help="Liste as competências gerais que serão desenvolvidas, como 'Análise crítica' ou 'Raciocínio lógico'.")
-habilidades = st.text_area("Habilidades", help="Defina as habilidades específicas, como 'Formular hipóteses estratégicas' ou 'Testar ideias no tabuleiro'.")
+        # Parte 2 - Competências, Conteúdo e Recursos
+        st.subheader("Competências, Conteúdo e Recursos")
+        competencia = st.text_area("Competência de Área:", help="Descreva as competências que serão trabalhadas na aula, alinhadas à BNCC ou outro documento oficial.")
+        habilidades = st.text_area("Habilidades:", help="Liste as habilidades que os alunos deverão desenvolver com esta aula.")
+        conteudo = st.text_area("Conteúdo:", help="Detalhe os conteúdos que serão abordados.")
+        recursos = st.text_area("Recursos:", help="Especifique os materiais, ferramentas ou equipamentos necessários para a aula.")
 
-# Conteúdo e Recursos
-st.header("Conteúdo e Recursos")
-conteudo = st.text_area("Conteúdo", help="Detalhe os conteúdos abordados na aula, como 'Etapas do método hipotético-dedutivo' ou 'Fundamentos do xadrez'.")
-recursos = st.text_area("Recursos", help="Liste os materiais e ferramentas necessários, como 'Tabuleiros físicos', 'Aplicativo Xadrez e Ciência' ou 'Computadores'.")
+        # Parte 3 - Organização dos Espaços
+        st.subheader("Organização dos Espaços")
+        espacos = []
+        for i in range(1, 4):
+            st.markdown(f"**Espaço {i}**")
+            atividade = st.text_area(f"Espaço {i} - Atividade:", help="Descreva a atividade que será realizada neste espaço.")
+            duracao_espaco = st.text_input(f"Espaço {i} - Duração:", help="Informe a duração estimada para esta atividade.")
+            papel_aluno = st.text_area(f"Espaço {i} - Papel do Aluno:", help="Explique o papel e as responsabilidades dos alunos nesta atividade.")
+            papel_professor = st.text_area(f"Espaço {i} - Papel do Professor:", help="Explique o papel e as responsabilidades do professor nesta atividade.")
+            espacos.append((atividade, duracao_espaco, papel_aluno, papel_professor))
 
-# Organização dos Espaços
-st.header("Organização dos Espaços")
-st.subheader("Espaço 1")
-atividade_espaco1 = st.text_area("Atividade no Espaço 1", help="Descreva a atividade inicial da aula, como 'Introdução ao método hipotético-dedutivo'.")
-duracao_espaco1 = st.text_input("Duração do Espaço 1")
-papel_aluno1 = st.text_area("Papel do Aluno no Espaço 1", help="Indique o que os alunos farão neste momento, como 'Observar e discutir as posições no tabuleiro'.")
-papel_professor1 = st.text_area("Papel do Professor no Espaço 1", help="Descreva a função do professor, como 'Orientar e explicar os conceitos'.")
-    
-st.subheader("Espaço 2")
-atividade_espaco2 = st.text_area("Atividade no Espaço 2", help="Defina a atividade intermediária, como 'Utilizar o aplicativo para testar hipóteses'.")
-duracao_espaco2 = st.text_input("Duração do Espaço 2")
-papel_aluno2 = st.text_area("Papel do Aluno no Espaço 2", help="Indique o que os alunos farão neste momento, como 'Testar estratégias e registrar resultados'.")
-papel_professor2 = st.text_area("Papel do Professor no Espaço 2", help="Descreva a função do professor, como 'Acompanhar os testes e fornecer feedback'.")
-    
-st.subheader("Espaço 3")
-atividade_espaco3 = st.text_area("Atividade no Espaço 3", help="Descreva a atividade final da aula, como 'Discutir os resultados obtidos e consolidar o aprendizado'.")
-duracao_espaco3 = st.text_input("Duração do Espaço 3")
-papel_aluno3 = st.text_area("Papel do Aluno no Espaço 3", help="Explique a participação dos alunos, como 'Compartilhar reflexões e aprender com os colegas'.")
-papel_professor3 = st.text_area("Papel do Professor no Espaço 3", help="Defina o papel do professor, como 'Medir e conduzir as discussões'.")
-    
-# Avaliação
-st.header("Avaliação")
-avaliacao_objetivos = st.text_area("O que pode ser feito para observar se os objetivos da aula foram cumpridos?", help="Liste os indicadores ou critérios para avaliar se os objetivos da aula foram alcançados.")
-avaliacao_feedback = st.text_area("Como foi sua avaliação da aula? (Aspectos positivos e negativos)", help="Reflexão sobre o que funcionou bem e o que pode ser melhorado na aula.")
+        # Parte 4 - Avaliação
+        st.subheader("Avaliação")
+        avaliacao_objetivos = st.text_area("Avaliação dos Objetivos:", help="Descreva como os objetivos da aula serão avaliados.")
+        avaliacao_aula = st.text_area("Avaliação da Aula:", help="Faça uma avaliação geral da aula, destacando os pontos positivos e aspectos a melhorar.")
 
-# Objetivo Específico para o Método Hipotético-Dedutivo
-st.header("Objetivo Específico para o Método Hipotético-Dedutivo")
-objetivo_mhd = st.text_area("Defina o objetivo específico para a utilização do MHD na aula", help="Explique como o MHD será aplicado, por exemplo: 'Ensinar os alunos a formular hipóteses e testá-las no tabuleiro'.")
-    
-# Etapas do Método Hipotético-Dedutivo
-st.header("Etapas do Método Hipotético-Dedutivo")
-observacao = st.text_area("Observação", help="O que os alunos devem observar inicialmente? Por exemplo: 'A posição atual no tabuleiro'.")
-hipotese = st.text_area("Hipótese", help="Que hipóteses os alunos devem propor? Por exemplo: 'O próximo movimento ideal para vencer'.")
-deducao = st.text_area("Dedução", help="Como as hipóteses serão analisadas? Por exemplo: 'Prevendo os desdobramentos das jogadas'.")
-teste_experimental = st.text_area("Teste Experimental", help="Explique como os alunos testarão suas hipóteses. Exemplo: 'Executar as jogadas no aplicativo'.")
-analise_consolidacao = st.text_area("Análise e Consolidação", help="Descreva como os resultados serão analisados. Exemplo: 'Comparar o resultado com a hipótese inicial'.")
-    
-# Registro e Reflexão
-st.header("Registro e Reflexão")
-registro_alunos = st.text_area("Registro dos Alunos", help="Explique como os alunos devem registrar suas hipóteses, testes e resultados.")
-questionamentos = st.text_area("Questionamentos Norteadores", help="Liste perguntas para guiar os alunos, como 'O que você espera alcançar com este movimento?'.")
-reflexao_final = st.text_area("Reflexão Final", help="Descreva a discussão final e os aprendizados a serem consolidados.")
-    
-# Botão para salvar o plano
-if st.button("Gerar Plano de Aula"):
-    st.success("Plano de aula gerado com sucesso!")
+        # Parte 5 - Etapas do Método Hipotético-Dedutivo
+        st.subheader("Etapas do Método Hipotético-Dedutivo")
+        observacao = st.text_area("Observação:", help="Descreva as observações iniciais feitas antes de começar a aula.")
+        hipotese = st.text_area("Hipótese:", help="Apresente as hipóteses levantadas a partir da observação.")
+        deducao = st.text_area("Dedução:", help="Explique a dedução feita a partir das hipóteses.")
+        teste = st.text_area("Teste Experimental:", help="Detalhe o teste experimental realizado para validar as hipóteses.")
+        analise = st.text_area("Análise e Consolidação:", help="Apresente a análise final e os resultados consolidados.")
+
+        # Parte 6 - Reflexão e Registros
+        st.subheader("Reflexão e Registros")
+        registro = st.text_area("Registro dos Alunos:", help="Registre as reflexões ou observações feitas pelos alunos.")
+        questionamentos = st.text_area("Questionamentos Norteadores:", help="Liste perguntas que guiarão a aula e a discussão.")
+        reflexao = st.text_area("Reflexão Final:", help="Escreva a reflexão final sobre a aula, considerando os aprendizados e desafios.")
+
+        submitted = st.form_submit_button("Gerar PDF")
+
+    if submitted:
+        # Geração do PDF
+        buffer = BytesIO()
+        c = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        margin_x = 50
+        margin_y = 50
+        y = height - margin_y
+
+        # Função auxiliar para justificar texto e verificar quebra de página
+        def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
+            words = text.split()
+            line = ""
+            for word in words:
+                test_line = " ".join([line, word]).strip()
+                if canvas.stringWidth(test_line, "Helvetica", 12) < max_width:
+                    line = test_line
+                else:
+                    canvas.drawString(x, y, line)
+                    y -= line_height
+                    if y < margin_y:  # Verificar margem inferior
+                        canvas.showPage()
+                        y = height - margin_y
+                        canvas.setFont("Helvetica", 12)
+                    line = word
+            if line:
+                canvas.drawString(x, y, line)
+                y -= line_height
+                if y < margin_y:  # Verificar margem inferior novamente
+                    canvas.showPage()
+                    y = height - margin_y
+                    canvas.setFont("Helvetica", 12)
+            return y
+
+        # Organização dos campos no PDF
+        c.setFont("Helvetica", 12)
+        sections = [
+            ("Nome do Professor", professor),
+            ("Disciplina", disciplina),
+            ("Duração da Aula", duracao),
+            ("Número de Alunos", numero_alunos),
+            ("Tema", tema),
+            ("Competência de Área", competencia),
+            ("Habilidades", habilidades),
+            ("Conteúdo", conteudo),
+            ("Recursos", recursos),
+ ]
+        
+        # Adicionar organização dos espaços ao PDF
+        for i, (atividade, duracao_espaco, papel_aluno, papel_professor) in enumerate(espacos, start=1):
+            sections.append((f"Espaço {i} - Atividade", atividade))
+            sections.append((f"Espaço {i} - Duração", duracao_espaco))
+            sections.append((f"Espaço {i} - Papel do Aluno", papel_aluno))
+            sections.append((f"Espaço {i} - Papel do Professor", papel_professor))
+
+        # Continuar com os campos restantes
+        sections += [
+            ("Avaliação dos Objetivos", avaliacao_objetivos),
+            ("Avaliação da Aula", avaliacao_aula),
+            ("Observação", observacao),
+            ("Hipótese", hipotese),
+            ("Dedução", deducao),
+            ("Teste Experimental", teste),
+            ("Análise e Consolidação", analise),
+            ("Registro dos Alunos", registro),
+            ("Questionamentos Norteadores", questionamentos),
+            ("Reflexão Final", reflexao),
+        ]
+
+        for label, value in sections:
+            c.drawString(margin_x, y, f"{label}:")
+            y -= 20
+            y = draw_wrapped_text(c, value, margin_x + 20, y, width - 2 * margin_x, 15)
+            y -= 20
+            if y < margin_y:
+                c.showPage()
+                y = height - margin_y
+                c.setFont("Helvetica", 12)
+
+        # Finalizar PDF
+        c.save()
+        buffer.seek(0)
+
+        # Exibir e baixar PDF
+        pdf_data = buffer.getvalue()
+        st.markdown("### Visualização do PDF")
+        st.markdown(
+            f'<iframe src="data:application/pdf;base64,{base64.b64encode(pdf_data).decode()}" width="700" height="500"></iframe>',
+            unsafe_allow_html=True,
+        )
+        st.download_button(
+            label="Baixar PDF",
+            data=pdf_data,
+            file_name="planejamento_aula.pdf",
+            mime="application/pdf",
+        )
