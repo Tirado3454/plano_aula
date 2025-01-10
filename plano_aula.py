@@ -51,12 +51,13 @@ def planejamento_aula_function():
         submitted = st.form_submit_button("Gerar PDF")
 
     if submitted:
+        # Geração do PDF
         buffer = BytesIO()
         c = canvas.Canvas(buffer, pagesize=letter)
         width, height = letter
         margin_x = 50
-        margin_y = 70  # Margem ajustada
-        y = height - margin_y - 30  # Ajuste inicial para começar mais abaixo
+        margin_y = 70  # Ajuste da margem inferior
+        y = height - margin_y - 20  # Ajuste inicial para começar mais abaixo
 
         def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
             words = text.split()
@@ -68,17 +69,17 @@ def planejamento_aula_function():
                 else:
                     canvas.drawString(x, y, line)
                     y -= line_height
-                    if y < margin_y:
+                    if y < margin_y:  # Verificar margem inferior
                         canvas.showPage()
-                        y = height - margin_y
+                        y = height - margin_y - 20  # Novo início na nova página
                         canvas.setFont("Helvetica", 12)
                     line = word
             if line:
                 canvas.drawString(x, y, line)
                 y -= line_height
-                if y < margin_y:
+                if y < margin_y:  # Verificar margem inferior novamente
                     canvas.showPage()
-                    y = height - margin_y
+                    y = height - margin_y - 20
                     canvas.setFont("Helvetica", 12)
             return y
 
@@ -87,6 +88,7 @@ def planejamento_aula_function():
             canvas.drawString(x, y, text)
             return y - 30
 
+        # Adicionar conteúdo ao PDF
         y = add_title(c, "Informações Gerais", margin_x, y)
         sections = [
             ("Nome do Professor", professor),
@@ -102,12 +104,14 @@ def planejamento_aula_function():
             y -= 20
             if y < margin_y:
                 c.showPage()
-                y = height - margin_y
+                y = height - margin_y - 20
                 c.setFont("Helvetica", 12)
 
+        # Finalizar PDF
         c.save()
         buffer.seek(0)
 
+        # Exibir e baixar PDF
         pdf_data = buffer.getvalue()
         st.markdown("### Visualização do PDF")
         st.markdown(
