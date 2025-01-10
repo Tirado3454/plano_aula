@@ -54,6 +54,7 @@ def planejamento_aula_function():
         questionamentos = st.text_area("Questionamentos Norteadores:", help="Liste perguntas que guiarão a aula e a discussão.")
         reflexao = st.text_area("Reflexão Final:", help="Escreva a reflexão final sobre a aula, considerando os aprendizados e desafios.")
 
+        # Botão de envio
         submitted = st.form_submit_button("Gerar PDF")
 
     if submitted:
@@ -65,6 +66,7 @@ def planejamento_aula_function():
         margin_y = 70
         y = height - margin_y - 30
 
+        # Função para desenhar texto justificado com quebra de página
         def draw_wrapped_text(canvas, text, x, y, max_width, line_height):
             words = text.split()
             line = ""
@@ -75,26 +77,27 @@ def planejamento_aula_function():
                 else:
                     canvas.drawString(x, y, line)
                     y -= line_height
-                    if y < margin_y:
+                    if y < margin_y:  # Quebra de página
                         canvas.showPage()
                         y = height - margin_y - 30
                         canvas.setFont("Helvetica", 12)
                     line = word
-            if line:
+            if line:  # Última linha
                 canvas.drawString(x, y, line)
                 y -= line_height
-                if y < margin_y:
+                if y < margin_y:  # Verificar margem inferior
                     canvas.showPage()
                     y = height - margin_y - 30
                     canvas.setFont("Helvetica", 12)
             return y
 
+        # Função para adicionar títulos
         def add_title(canvas, text, x, y):
             canvas.setFont("Helvetica-Bold", 14)
             canvas.drawString(x, y, text)
             return y - 30
 
-        # Adicionar seções com todos os itens
+        # Adicionar seções ao PDF
         def add_section(canvas, title, fields, y):
             y = add_title(canvas, title, margin_x, y)
             for label, value in fields:
@@ -105,7 +108,6 @@ def planejamento_aula_function():
                 if y < margin_y:
                     c.showPage()
                     y = height - margin_y - 30
-                    c.setFont("Helvetica", 12)
             return y
 
         y = add_section(c, "Informações Gerais", [
